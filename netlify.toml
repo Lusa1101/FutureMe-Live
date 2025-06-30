@@ -1,6 +1,9 @@
 [build]
   publish = ".next"
-  command = "npm run build"
+  command = "pnpm run build"
+
+[[plugins]]
+  package = "@netlify/next"
 
 [build.environment]
   NODE_VERSION = "18"
