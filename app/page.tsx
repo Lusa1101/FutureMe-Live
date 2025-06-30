@@ -8,6 +8,7 @@ import { ConversationInterface } from "@/components/conversation-interface";
 import { GrowthTimeline } from "@/components/growth-timeline";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
+import { BoltBadge } from "@/components/ui/bolt-badge";
 
 export default function Home() {
   const [isStarted, setIsStarted] = useState(false);
@@ -76,6 +77,11 @@ export default function Home() {
             >
               FutureMe Live
             </motion.h1>
+            
+            {/* Bolt.new Badge - positioned in top right */}
+            <div className="relative">
+              <BoltBadge />
+            </div>
 
             <motion.p
               className="text-xl md:text-2xl text-slate-300 dark:text-slate-300 light:text-slate-700 mb-8 leading-relaxed"
@@ -165,6 +171,11 @@ export default function Home() {
           <p className="text-slate-300 dark:text-slate-300 light:text-slate-700">
             Having a conversation with your future self
           </p>
+            
+            {/* Bolt.new Badge - positioned in top right */}
+            <div className="relative">
+              <BoltBadge />
+            </div>
         </motion.header>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[70vh]">

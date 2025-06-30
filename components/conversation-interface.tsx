@@ -6,6 +6,8 @@ import { Send, Mic, MicOff, Volume2, Sparkles, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useTextToSpeech } from "@/hooks/useTextToSpeech";
+import { generateToiletGptResponse, generateWisdomQuoteImage } from '@/app/actions';
 
 interface ConversationInterfaceProps {
   currentEmotion: string;
@@ -132,6 +134,8 @@ export function ConversationInterface({ currentEmotion }: ConversationInterfaceP
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
 
+  const { speak, isSpeaking, stop: stopSpeaking } = useTextToSpeech();
+
   // Check for speech recognition support
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -236,22 +240,72 @@ export function ConversationInterface({ currentEmotion }: ConversationInterfaceP
     setInputValue("");
     setIsTyping(true);
 
-    // Simulate AI response with emotion-aware responses using current emotion
-    setTimeout(() => {
-      const emotionData = emotionResponses[currentEmotion as keyof typeof emotionResponses] || emotionResponses.neutral;
-      const response = emotionData.responses[Math.floor(Math.random() * emotionData.responses.length)];
-      
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        type: "ai",
-        content: response,
-        emotion: currentEmotion,
-        timestamp: new Date(),
-      };
+    try {
+      const response = await generateToiletGptResponse(
+          inputValue,
+          currentEmotion,
+          messages.map(m => ({ role: 'user', content: m.content }))
+        );
 
-      setMessages(prev => [...prev, aiMessage]);
-      setIsTyping(false);
-    }, 2000);
+      if(response.success && response.response){
+        const aiMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          type: "ai",
+          content: response.response,
+          emotion: currentEmotion,
+          timestamp: new Date(),
+        };
+
+        setMessages(prev => [...prev, aiMessage]);
+        setIsTyping(false);
+
+        try {
+          await speak(response.response);
+        } catch (speechError) {
+            console.warn('Text-to-speech failed:', speechError);
+            // Don't show error to user for TTS failure, just log it
+        }
+      } else {
+          // API returned error response
+          // lastError = response.error || 'Unknown error occurred';
+          // console.error(`Attempt ${attempt} failed:`, lastError);
+          
+          // // If this is the last attempt, don't retry
+          // if (attempt === maxRetries) {
+          //   break;
+          // }
+          
+          // // Wait before retrying (exponential backoff)
+          // const delayMs = Math.min(1000 * Math.pow(2, attempt - 1), 5000); // 1s, 2s, 4s max
+          console.log('Failed to get response.');//`Waiting ${delayMs}ms before retry...`);
+          //await delay(delayMs);
+        }
+    }catch(error) {
+      // Simulate AI response with emotion-aware responses using current emotion
+      setTimeout(async () => {
+        const emotionData = emotionResponses[currentEmotion as keyof typeof emotionResponses] || emotionResponses.neutral;
+        const response = emotionData.responses[Math.floor(Math.random() * emotionData.responses.length)];
+            
+        const aiMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          type: "ai",
+          content: response,
+          emotion: currentEmotion,
+          timestamp: new Date(),
+        };
+
+        setMessages(prev => [...prev, aiMessage]);
+        setIsTyping(false);
+
+        // Speak the response
+            try {
+              await speak(aiMessage.content);
+            } catch (speechError) {
+              console.warn('Text-to-speech failed:', speechError);
+              // Don't show error to user for TTS failure, just log it
+            }
+      }, 2000);
+    }
   };
 
   const toggleListening = () => {
