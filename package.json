@@ -4,13 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "cross-env NEXT_SWC_BINARY_TARGET=wasm NEXT_IGNORE_TYPE_ERRORS=true next build",
+    "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "export": "next export",
-    "deploy": "npm run build && npm run export",
-    "genkit:dev": "genkit start -- npm run dev",
-    "genkit:flow": "genkit flow:run"
+    "lint": "next lint"
   },
   "dependencies": {
     "@genkit-ai/ai": "^0.5.0",
