@@ -26,11 +26,11 @@ Whether you're navigating workplace stress or seeking personal reassurance, Futu
    ```bash
    git clone https://github.com/Lusa1101/FutureMe-Live.git
    cd FutureMe-Live
-2. **Install dependencies**
+2. **Install dependencies**: 
    npm install
-3. **Run locally**
+3. **Run locally**: 
    npm run dev
-4. **Access the app**
+4. **Access the app**: 
    Open http://localhost:3000 in your browser and allow webcam access.
 
 ## 💡 Use Cases
